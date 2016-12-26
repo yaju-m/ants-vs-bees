@@ -307,15 +307,6 @@ class FireAnt(Ant):
 
         # END Problem 4A
 
-class WallAnt(Ant): 
-    name = 'Wall'
-    food_cost = 4 
-    implemented= False 
-
-    def __init__(self, armor=4):
-        """Create an Ant with an ARMOR quantity."""
-        Ant.__init__(self, armor)
-
 
 class LongThrower(ThrowerAnt):
     """A ThrowerAnt that only throws leaves at Bees at least 5 places away."""
@@ -338,8 +329,17 @@ class ShortThrower(ThrowerAnt):
     implemented = True   # Change to True to view in the GUI
     # END Problem 4B
 
+
 # BEGIN Problem 5A
-"*** REPLACE THIS LINE ***"
+class WallAnt(Ant): 
+    name = 'Wall'
+    food_cost = 4 
+    implemented= False 
+
+    def __init__(self, armor=4):
+        """Create an Ant with an ARMOR quantity."""
+        Ant.__init__(self, armor)
+
 # The WallAnt class
 # END Problem 5A
 
@@ -526,29 +526,61 @@ class AntRemover(Ant):
 ##################
 # Status Effects #
 ##################
-
-def make_slow(action):
+def make_slow(orig_action, duration, bee):
     """Return a new action method that calls ACTION every other turn.
 
     action -- An action method of some Bee
     """
     # BEGIN Problem EC
-    "*** REPLACE THIS LINE ***"
+
+    def slow_action(colony):
+        effected_action = bee.action
+        nonlocal duration
+        if duration:
+            duration -= 1
+            if colony.time % 2 == 0:
+                bee.action = orig_action
+                bee.action(colony)
+                bee.action = effected_action  
+            else:
+                return None
+        else:
+            bee.action = orig_action
+            bee.action(colony)
+
+    return slow_action
+        
+
     # END Problem EC
 
-def make_stun(action):
+def make_stun(orig_action, duration, bee):
     """Return a new action method that does nothing.
 
     action -- An action method of some Bee
     """
     # BEGIN Problem EC
-    "*** REPLACE THIS LINE ***"
+
+    def stun_action(colony):
+        effected_action = bee.action
+        nonlocal duration
+        if duration:
+            duration -= 1
+        else:
+            bee.action = orig_action
+            bee.action(colony)
+
+
+    return stun_action
     # END Problem EC
 
 def apply_effect(effect, bee, duration):
     """Apply a status effect to a BEE that lasts for DURATION turns."""
     # BEGIN Problem EC
-    "*** REPLACE THIS LINE ***"
+    bee.action = effect(bee.action, duration, bee)
+
+
+
+
     # END Problem EC
 
 
@@ -557,7 +589,8 @@ class SlowThrower(ThrowerAnt):
 
     name = 'Slow'
     # BEGIN Problem EC
-    "*** REPLACE THIS LINE ***"
+    food_cost = 4
+    armor = 1
     implemented = False   # Change to True to view in the GUI
     # END Problem EC
 
@@ -571,7 +604,8 @@ class StunThrower(ThrowerAnt):
 
     name = 'Stun'
     # BEGIN Problem EC
-    "*** REPLACE THIS LINE ***"
+    food_cost = 6
+    armor = 1
     implemented = False   # Change to True to view in the GUI
     # END Problem EC
 
